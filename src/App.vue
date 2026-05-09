@@ -5,15 +5,14 @@
     <header>
       <div class="header-badge">📚 JUPAS 2025</div>
       <h1>香港大學收生分數<br><span class="gradient-text">智能配對系統</span></h1>
-      <p class="subtitle">輸入你嘅 HKDSE 成績，自動計算符合嘅課程</p>
+      <p class="subtitle">輸入你嘅 HKDSE 成績，計算升學機會</p>
     </header>
 
-    <!-- ===== HKDSE Calculator ===== -->
+    <!-- ===== Calculator ===== -->
     <section class="calc-section">
       <h2 class="section-title">🎯 HKDSE 分數計算機</h2>
-      <p class="calc-hint">選擇你預計 / 實際拿到的等級，系統會自動計算你的「最佳5科」總分</p>
+      <p class="calc-hint">選擇你預計 / 實際拿到的等級，系統會計算「最佳5科」總分及升學機會</p>
 
-      <!-- Grade inputs -->
       <div class="grade-grid">
         <div class="grade-item" v-for="(subj, idx) in subjects" :key="idx">
           <label>{{ subj.label }}</label>
@@ -24,9 +23,8 @@
         </div>
       </div>
 
-      <!-- Score summary -->
       <div class="score-summary" v-if="best5Score > 0">
-        <div class="score-pill">
+        <div class="score-pill highlight">
           <span class="score-pill-label">最佳5科總分</span>
           <span class="score-pill-value">{{ best5Score.toFixed(1) }}</span>
         </div>
@@ -36,7 +34,7 @@
         </div>
       </div>
 
-      <!-- Match results -->
+      <!-- Match Results -->
       <div v-if="best5Score > 0" class="match-results">
         <div class="match-summary-row">
           <div class="match-chip safe">
@@ -54,9 +52,9 @@
         </div>
 
         <div v-if="matchResults.safe.length" class="match-group">
-          <h3 class="match-title safe">✅ 穩陣（低於中位分）</h3>
+          <h3 class="match-title safe">✅ 穩陣（高於中位分）</h3>
           <div class="match-cards">
-            <div v-for="p in matchResults.safe.slice(0,6)" :key="p.code + p.uni" class="program-card safe">
+            <div v-for="p in matchResults.safe.slice(0,9)" :key="p.code + p.uni" class="program-card safe">
               <div class="card-header">
                 <span class="uni-dot" :style="{background: getUni(p.uni).color}"></span>
                 <span class="uni-name">{{ getUni(p.uni).name_en }}</span>
@@ -65,19 +63,45 @@
               <div class="prog-name">{{ p.name }}</div>
               <div class="prog-meta">
                 <span class="cat-tag">{{ p.category }}</span>
-                <span class="prog-score">
-                  中位 {{ p.median }} / 你的 {{ best5Score.toFixed(1) }}
-                  <span class="diff plus">+{{ (best5Score - p.median).toFixed(1) }}</span>
-                </span>
+                <span class="years-tag" v-if="p.years !== 4">{{ p.years }}年</span>
+                <span class="interview-tag" v-if="p.interview">面試</span>
+              </div>
+              <div class="prog-scores">
+                <div class="score-row">
+                  <span class="score-label">上四分位</span>
+                  <span class="score-val">{{ p.uq ?? '—' }}</span>
+                </div>
+                <div class="score-row">
+                  <span class="score-label">中位分</span>
+                  <span class="score-val median">{{ p.median }}</span>
+                </div>
+                <div class="score-row">
+                  <span class="score-label">下四分位</span>
+                  <span class="score-val">{{ p.lq ?? '—' }}</span>
+                </div>
+                <div class="score-row your">
+                  <span class="score-label">你的分數</span>
+                  <span class="score-val" :style="{color: scoreColor(p.median)}">{{ best5Score.toFixed(1) }}</span>
+                </div>
+              </div>
+              <div class="chance-bar-wrap">
+                <div class="chance-label">
+                  <span>升學機會</span>
+                  <strong :style="{color: chanceColor(p.chance)}">{{ chanceLabel(p.chance) }}</strong>
+                </div>
+                <div class="chance-bar-bg">
+                  <div class="chance-bar" :style="{width: p.chance + '%', background: chanceColor(p.chance)}"></div>
+                </div>
+                <div class="chance-pct">{{ p.chance }}%</div>
               </div>
             </div>
           </div>
         </div>
 
         <div v-if="matchResults.match.length" class="match-group">
-          <h3 class="match-title match">🎯 合理（在中位分附近）</h3>
+          <h3 class="match-title match">🎯 合理（接近中位分）</h3>
           <div class="match-cards">
-            <div v-for="p in matchResults.match.slice(0,6)" :key="p.code + p.uni" class="program-card match">
+            <div v-for="p in matchResults.match.slice(0,9)" :key="p.code + p.uni" class="program-card match">
               <div class="card-header">
                 <span class="uni-dot" :style="{background: getUni(p.uni).color}"></span>
                 <span class="uni-name">{{ getUni(p.uni).name_en }}</span>
@@ -86,21 +110,45 @@
               <div class="prog-name">{{ p.name }}</div>
               <div class="prog-meta">
                 <span class="cat-tag">{{ p.category }}</span>
-                <span class="prog-score">
-                  中位 {{ p.median }} / 你的 {{ best5Score.toFixed(1) }}
-                  <span class="diff" :class="best5Score >= p.median ? 'plus' : 'minus'">
-                    {{ best5Score >= p.median ? '+' : '' }}{{ (best5Score - p.median).toFixed(1) }}
-                  </span>
-                </span>
+                <span class="years-tag" v-if="p.years !== 4">{{ p.years }}年</span>
+                <span class="interview-tag" v-if="p.interview">面試</span>
+              </div>
+              <div class="prog-scores">
+                <div class="score-row" v-if="p.uq">
+                  <span class="score-label">上四分位</span>
+                  <span class="score-val">{{ p.uq }}</span>
+                </div>
+                <div class="score-row">
+                  <span class="score-label">中位分</span>
+                  <span class="score-val median">{{ p.median }}</span>
+                </div>
+                <div class="score-row">
+                  <span class="score-label">下四分位</span>
+                  <span class="score-val">{{ p.lq ?? '—' }}</span>
+                </div>
+                <div class="score-row your">
+                  <span class="score-label">你的分數</span>
+                  <span class="score-val" :style="{color: scoreColor(p.median)}">{{ best5Score.toFixed(1) }}</span>
+                </div>
+              </div>
+              <div class="chance-bar-wrap">
+                <div class="chance-label">
+                  <span>升學機會</span>
+                  <strong :style="{color: chanceColor(p.chance)}">{{ chanceLabel(p.chance) }}</strong>
+                </div>
+                <div class="chance-bar-bg">
+                  <div class="chance-bar" :style="{width: p.chance + '%', background: chanceColor(p.chance)}"></div>
+                </div>
+                <div class="chance-pct">{{ p.chance }}%</div>
               </div>
             </div>
           </div>
         </div>
 
         <div v-if="matchResults.reach.length" class="match-group">
-          <h3 class="match-title reach">🔥 衝刺（高於中位分）</h3>
+          <h3 class="match-title reach">🔥 衝刺（低於下四分位）</h3>
           <div class="match-cards">
-            <div v-for="p in matchResults.reach.slice(0,6)" :key="p.code + p.uni" class="program-card reach">
+            <div v-for="p in matchResults.reach.slice(0,9)" :key="p.code + p.uni" class="program-card reach">
               <div class="card-header">
                 <span class="uni-dot" :style="{background: getUni(p.uni).color}"></span>
                 <span class="uni-name">{{ getUni(p.uni).name_en }}</span>
@@ -109,10 +157,36 @@
               <div class="prog-name">{{ p.name }}</div>
               <div class="prog-meta">
                 <span class="cat-tag">{{ p.category }}</span>
-                <span class="prog-score">
-                  中位 {{ p.median }} / 你的 {{ best5Score.toFixed(1) }}
-                  <span class="diff minus">{{ (best5Score - p.median).toFixed(1) }}</span>
-                </span>
+                <span class="years-tag" v-if="p.years !== 4">{{ p.years }}年</span>
+                <span class="interview-tag" v-if="p.interview">面試</span>
+              </div>
+              <div class="prog-scores">
+                <div class="score-row" v-if="p.uq">
+                  <span class="score-label">上四分位</span>
+                  <span class="score-val">{{ p.uq }}</span>
+                </div>
+                <div class="score-row">
+                  <span class="score-label">中位分</span>
+                  <span class="score-val median">{{ p.median }}</span>
+                </div>
+                <div class="score-row">
+                  <span class="score-label">下四分位</span>
+                  <span class="score-val">{{ p.lq ?? '—' }}</span>
+                </div>
+                <div class="score-row your">
+                  <span class="score-label">你的分數</span>
+                  <span class="score-val" :style="{color: scoreColor(p.median)}">{{ best5Score.toFixed(1) }}</span>
+                </div>
+              </div>
+              <div class="chance-bar-wrap">
+                <div class="chance-label">
+                  <span>升學機會</span>
+                  <strong :style="{color: chanceColor(p.chance)}">{{ chanceLabel(p.chance) }}</strong>
+                </div>
+                <div class="chance-bar-bg">
+                  <div class="chance-bar" :style="{width: p.chance + '%', background: chanceColor(p.chance)}"></div>
+                </div>
+                <div class="chance-pct">{{ p.chance }}%</div>
               </div>
             </div>
           </div>
@@ -120,12 +194,11 @@
       </div>
     </section>
 
-    <!-- ===== Divider ===== -->
-    <div class="section-divider"><span>或者 Browse 所有課程</span></div>
+    <div class="section-divider"><span>全部課程庫</span></div>
 
     <!-- ===== Program Browser ===== -->
     <section class="browser-section">
-      <h2 class="section-title">📋 全部課程庫</h2>
+      <h2 class="section-title">📋 全部課程 ({{ filteredPrograms.length }})</h2>
 
       <div class="filters">
         <div class="filter-group">
@@ -138,33 +211,21 @@
         <div class="filter-group">
           <label>類別</label>
           <select v-model="selectedCategory">
-            <option value="全部">全部類別</option>
-            <option v-for="c in categories.slice(1)" :key="c" :value="c">{{ c }}</option>
+            <option value="">全部類別</option>
+            <option v-for="c in categories" :key="c" :value="c">{{ c }}</option>
           </select>
         </div>
         <div class="filter-group">
           <label>搜尋</label>
-          <input v-model="searchQuery" type="text" placeholder="課程名稱..." @input="currentPage = 1" />
+          <input v-model="searchQuery" type="text" placeholder="課程名稱 / 編號..." @input="currentPage = 1" />
         </div>
-        <div class="filter-stats"><strong>{{ filteredPrograms.length }}</strong> 個課程</div>
-      </div>
-
-      <div class="stats-row">
-        <div class="stat-card">
-          <div class="stat-num">{{ filteredPrograms.length }}</div>
-          <div class="stat-label">課程總數</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-num green">{{ highestScore }}</div>
-          <div class="stat-label">最高中位分</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-num yellow">{{ avgMedian }}</div>
-          <div class="stat-label">平均中位分</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-num">{{ universities.length }}</div>
-          <div class="stat-label">院校數</div>
+        <div class="filter-group">
+          <label>排序</label>
+          <select v-model="sortBy">
+            <option value="median-desc">分數 高→低</option>
+            <option value="median-asc">分數 低→高</option>
+            <option value="name">課程名稱</option>
+          </select>
         </div>
       </div>
 
@@ -175,9 +236,12 @@
               <th>院校</th>
               <th>課程名稱</th>
               <th>類別</th>
-              <th>計分公式</th>
+              <th>計分</th>
+              <th>上四分</th>
               <th>中位分</th>
-              <th>難度</th>
+              <th>下四分</th>
+              <th>年</th>
+              <th>面試</th>
             </tr>
           </thead>
           <tbody>
@@ -195,17 +259,18 @@
               </td>
               <td><span class="cat-tag">{{ p.category }}</span></td>
               <td class="formula-cell">{{ p.formula }}</td>
-              <td>
-                <strong class="median-score" :style="{color: scoreColor(p.median)}">{{ p.median }}</strong>
-                <span class="lq-hint" v-if="p.lq">/ {{ p.lq }}</span>
+              <td class="num-cell" :class="p.uq ? 'has-uq' : ''">{{ p.uq ?? '—' }}</td>
+              <td class="num-cell">
+                <strong :style="{color: scoreColor(p.median)}">{{ p.median ?? '—' }}</strong>
               </td>
-              <td>
-                <div class="difficulty-bar-wrap">
-                  <div class="diff-bar-bg">
-                    <div class="diff-bar" :style="{width: barWidth(p.median), background: scoreColor(p.median)}"></div>
-                  </div>
-                  <span class="diff-label" :style="{color: scoreColor(p.median)}">{{ difficulty(p.median) }}</span>
-                </div>
+              <td class="num-cell" :class="p.lq ? 'has-lq' : ''">{{ p.lq ?? '—' }}</td>
+              <td class="num-cell">
+                <span class="years-tag" v-if="p.years !== 4">{{ p.years }}年</span>
+                <span v-else class="text-dim">4</span>
+              </td>
+              <td class="num-cell">
+                <span class="interview-tag" v-if="p.interview">要</span>
+                <span v-else class="text-dim">—</span>
               </td>
             </tr>
           </tbody>
@@ -221,16 +286,20 @@
 
     <footer>
       資料來源：JUPAS 官方網站 · 2025 entry · 僅供參考<br/>
-      <small>計分制各院校不同，跨校比較僅供參考。實際取錄分數每年因申請人整體表現而異。</small>
+      <small>升學機會僅作估算，實際取錄視乎面試、Band選擇、整體申請者表現等因素。個別院校計分制不同，不可跨校比較。</small>
     </footer>
   </div>
 </template>
 
+
 <script setup>
 import { ref, computed, watch } from 'vue'
-import { universities, programs, categories, gradePoints, gradeOptions } from './data.js'
+import { universities, programs, gradePoints, gradeOptions } from './data.js'
 
-const PAGE_SIZE = 25
+const PAGE_SIZE = 30
+
+// ---- Categories ----
+const categories = [...new Set(programs.map(p => p.category))].sort()
 
 // ---- HKDSE Calculator ----
 const subjects = [
@@ -252,40 +321,81 @@ const best5Score = computed(() => {
   return pts.slice(0, 5).reduce((s, x) => s + x, 0)
 })
 
+// Calculate admission chance based on score vs quartiles
+function calcChance(score, median, lq, uq) {
+  if (median == null) return 0
+  if (score >= (uq ?? median + 5)) return Math.min(95, 75 + (score - median) * 2)
+  if (score >= median) {
+    const range = (uq ?? median + 5) - median
+    const pos = score - median
+    return Math.round(65 + (pos / range) * 20)
+  }
+  if (score >= (lq ?? median - 5)) {
+    const top = median
+    const bot = lq ?? median - 5
+    const pos = score - bot
+    return Math.round(35 + (pos / (top - bot)) * 30)
+  }
+  if (score >= lq - 5) return Math.round(15 + (score - (lq - 5)) * 4)
+  return Math.max(5, Math.round((score / (lq ?? 10)) * 15))
+}
+
 const matchResults = computed(() => {
   if (best5Score.value === 0) return { safe: [], match: [], reach: [] }
   const score = best5Score.value
   const safe = [], match = [], reach = []
   for (const p of programs) {
     if (p.median == null) continue
+    const chance = calcChance(score, p.median, p.lq, p.uq)
+    const progWithChance = { ...p, chance }
     const diff = score - p.median
-    if (diff >= 5) safe.push(p)
-    else if (diff >= -5) match.push(p)
-    else reach.push(p)
+    if (diff >= 3) safe.push(progWithChance)
+    else if (diff >= -5) match.push(progWithChance)
+    else reach.push(progWithChance)
   }
   safe.sort((a, b) => b.median - a.median)
-  match.sort((a, b) => b.median - a.median)
+  match.sort((a, b) => b.chance - a.chance)
   reach.sort((a, b) => a.median - b.median)
   return { safe, match, reach }
 })
 
+function chanceLabel(chance) {
+  if (chance >= 80) return '極高'
+  if (chance >= 65) return '高'
+  if (chance >= 45) return '中'
+  if (chance >= 25) return '低'
+  return '極低'
+}
+
+function chanceColor(chance) {
+  if (chance >= 70) return '#4ade80'
+  if (chance >= 50) return '#fbbf24'
+  if (chance >= 30) return '#f97316'
+  return '#f87171'
+}
+
 // ---- Browser ----
 const selectedUni = ref('all')
-const selectedCategory = ref('全部')
+const selectedCategory = ref('')
 const searchQuery = ref('')
+const sortBy = ref('median-desc')
 const currentPage = ref(1)
 
-watch([selectedUni, selectedCategory, searchQuery], () => { currentPage.value = 1 })
+watch([selectedUni, selectedCategory, searchQuery, sortBy], () => { currentPage.value = 1 })
 
 const filteredPrograms = computed(() => {
   let list = programs
   if (selectedUni.value !== 'all') list = list.filter(p => p.uni === selectedUni.value)
-  if (selectedCategory.value !== '全部') list = list.filter(p => p.category === selectedCategory.value)
+  if (selectedCategory.value) list = list.filter(p => p.category === selectedCategory.value)
   if (searchQuery.value.trim()) {
     const q = searchQuery.value.toLowerCase()
-    list = list.filter(p => p.name.toLowerCase().includes(q) || p.code.toLowerCase().includes(q))
+    list = list.filter(p => p.name.toLowerCase().includes(q) || p.code.toLowerCase().includes(q) || p.formula.toLowerCase().includes(q))
   }
-  return [...list].sort((a, b) => b.median - a.median)
+  list = [...list]
+  if (sortBy.value === 'median-desc') list.sort((a, b) => (b.median ?? 0) - (a.median ?? 0))
+  else if (sortBy.value === 'median-asc') list.sort((a, b) => (a.median ?? 0) - (b.median ?? 0))
+  else if (sortBy.value === 'name') list.sort((a, b) => a.name.localeCompare(b.name))
+  return list
 })
 
 const totalPages = computed(() => Math.max(1, Math.ceil(filteredPrograms.value.length / PAGE_SIZE)))
@@ -300,34 +410,14 @@ const pageRange = computed(() => {
   return range
 })
 
-const highestScore = computed(() => {
-  if (!filteredPrograms.value.length) return 0
-  return Math.max(...filteredPrograms.value.map(p => p.median))
-})
-const avgMedian = computed(() => {
-  if (!filteredPrograms.value.length) return 0
-  return (filteredPrograms.value.reduce((s, p) => s + p.median, 0) / filteredPrograms.value.length).toFixed(1)
-})
-
 function getUni(id) { return universities.find(u => u.id === id) || {} }
 
 function scoreColor(score) {
-  if (score >= 200) return '#f56c6c'
-  if (score >= 50) return '#f56c6c'
-  if (score >= 30) return '#f5c842'
-  if (score >= 20) return '#5ce6a1'
-  return '#6c8ef5'
-}
-
-function difficulty(score) {
-  if (score >= 200) return '極難'
-  if (score >= 50) return '極難'
-  if (score >= 30) return '困難'
-  if (score >= 20) return '中等'
-  return '一般'
-}
-
-function barWidth(score) {
-  return Math.min(100, (score / 340 * 100)).toFixed(1) + '%'
+  if (score == null) return '#7a8099'
+  if (score >= 50) return '#f87171'
+  if (score >= 30) return '#fbbf24'
+  if (score >= 200) return '#f87171'
+  if (score >= 180) return '#fbbf24'
+  return '#4ade80'
 }
 </script>
