@@ -63,7 +63,7 @@
               <div class="prog-tags">
                 <span class="tag">{{ p.category }}</span>
                 <span class="tag years" v-if="p.years !== 4">{{ p.years }}年</span>
-                <span class="tag incompatible" v-if="p.incompatible">⚠ 非HKDSE計分</span>
+                <span class="tag incompatible" v-if="p.incompatible">⚠ {{ p.formula }}（計分制與HKDSE不同）</span>
                 <span class="tag interview" v-if="p.interview && !p.incompatible">&#x1F4AC; 面試</span>
               </div>
             </div>
@@ -111,7 +111,7 @@
               <div class="prog-tags">
                 <span class="tag">{{ p.category }}</span>
                 <span class="tag years" v-if="p.years !== 4">{{ p.years }}年</span>
-                <span class="tag incompatible" v-if="p.incompatible">⚠ 非HKDSE計分</span>
+                <span class="tag incompatible" v-if="p.incompatible">⚠ {{ p.formula }}（計分制與HKDSE不同）</span>
                 <span class="tag interview" v-if="p.interview && !p.incompatible">&#x1F4AC; 面試</span>
               </div>
             </div>
@@ -155,7 +155,7 @@
               <div class="prog-tags">
                 <span class="tag">{{ p.category }}</span>
                 <span class="tag years" v-if="p.years !== 4">{{ p.years }}年</span>
-                <span class="tag incompatible" v-if="p.incompatible">⚠ 非HKDSE計分</span>
+                <span class="tag incompatible" v-if="p.incompatible">⚠ {{ p.formula }}（計分制與HKDSE不同）</span>
                 <span class="tag interview" v-if="p.interview && !p.incompatible">&#x1F4AC; 面試</span>
               </div>
             </div>
@@ -247,7 +247,7 @@
               <div class="prog-tags">
                 <span class="tag">{{ p.category }}</span>
                 <span class="tag years" v-if="p.years !== 4">{{ p.years }}年</span>
-                <span class="tag incompatible" v-if="p.incompatible">⚠ 非HKDSE計分</span>
+                <span class="tag incompatible" v-if="p.incompatible">⚠ {{ p.formula }}（計分制與HKDSE不同）</span>
                 <span class="tag interview" v-if="p.interview && !p.incompatible">&#x1F4AC; 面試</span>
               </div>
             </div>
