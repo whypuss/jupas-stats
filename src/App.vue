@@ -28,10 +28,24 @@
         </div>
       </div>
 
+      <!-- Bonus Input -->
+      <div class="bonus-row" v-if="best5Score > 0 || bonusScore > 0">
+        <div class="bonus-label">⬡ M1/M2 額外加分</div>
+        <div class="bonus-input-wrap">
+          <input type="number" v-model.number="bonusScore" min="0" max="20" step="0.5" class="bonus-input" placeholder="0">
+          <span class="bonus-unit">分</span>
+        </div>
+      </div>
+
       <!-- Score -->
       <div class="score-card" v-if="best5Score > 0">
         <div class="score-big">{{ best5Score.toFixed(1) }}</div>
-        <div class="score-label">最佳5科總分</div>
+        <div class="score-label">最佳5科 + M1/M2 總分</div>
+        <div class="score-breakdown" v-if="bonusScore > 0">
+          <span class="score-part">Best5: {{ (best5Score - bonusScore).toFixed(1) }}</span>
+          <span class="score-plus">+</span>
+          <span class="score-bonus">{{ bonusScore }}</span>
+        </div>
       </div>
 
       <!-- Match Chips -->
@@ -298,9 +312,10 @@ const categories = [...new Set(programs.map(p => p.category))].sort()
 
 const subjects = [
   { label: '中文' }, { label: '英文' }, { label: '數學' },
-  { label: '通識' }, { label: '選修1' }, { label: '選修2' }, { label: '選修3' },
+  { label: '選修1' }, { label: '選修2' }, { label: '選修3' },
 ]
-const grades = ref(['', '', '', '', '', '', ''])
+const grades = ref(['', '', '', '', '', ''])
+const bonusScore = ref(0)
 
 function gradeClass(g) {
   if (g === '5**') return 'grade-5starstar'
@@ -312,7 +327,7 @@ function gradeClass(g) {
 
 const best5Score = computed(() => {
   const pts = grades.value.map(g => gradePoints[g] || 0).sort((a, b) => b - a)
-  return pts.slice(0, 5).reduce((s, x) => s + x, 0)
+  return pts.slice(0, 5).reduce((s, x) => s + x, 0) + (bonusScore.value || 0)
 })
 
 function calcChance(score, median, lq, uq) {

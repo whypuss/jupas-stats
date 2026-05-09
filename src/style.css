@@ -140,6 +140,60 @@ header {
 }
 .score-label { font-size: 13px; color: var(--text3); margin-top: 4px; }
 
+
+/* ── Bonus Input ── */
+.bonus-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 10px 14px;
+  margin-bottom: 12px;
+  box-shadow: var(--shadow);
+  border-left: 3px solid var(--warning);
+}
+.bonus-label {
+  font-size: 14px;
+  color: var(--text2);
+  font-weight: 500;
+}
+.bonus-input-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.bonus-input {
+  width: 60px;
+  padding: 6px 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 16px;
+  text-align: center;
+  background: var(--bg);
+  color: var(--text);
+  font-weight: 600;
+}
+.bonus-input:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+.bonus-unit {
+  color: var(--text3);
+  font-size: 13px;
+}
+.score-breakdown {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 4px;
+  font-size: 13px;
+}
+.score-part { color: var(--text3); }
+.score-plus { color: var(--warning); font-weight: bold; }
+.score-bonus { color: var(--warning); font-weight: bold; }
+
 /* ── Match Chips ── */
 .match-chips { display: flex; gap: 8px; margin-bottom: 16px; }
 .match-chip {
