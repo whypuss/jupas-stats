@@ -63,11 +63,12 @@
               <div class="prog-tags">
                 <span class="tag">{{ p.category }}</span>
                 <span class="tag years" v-if="p.years !== 4">{{ p.years }}年</span>
-                <span class="tag interview" v-if="p.interview">&#x1F4AC; 面試</span>
+                <span class="tag incompatible" v-if="p.incompatible">⚠ 計分不同</span>
+                <span class="tag interview" v-if="p.interview && !p.incompatible">&#x1F4AC; 面試</span>
               </div>
             </div>
             <div class="prog-card-right">
-              <div class="chance-big" :style="{color: chanceColor(p.chance)}">{{ p.chance }}%</div>
+              <div class="chance-big" :style="{color: p.incompatible ? 'var(--text3)' : chanceColor(p.chance)}">{{ p.incompatible ? '—' : p.chance + '%' }}</div>
               <div class="chance-label-sm">機會</div>
             </div>
           </div>
@@ -110,11 +111,12 @@
               <div class="prog-tags">
                 <span class="tag">{{ p.category }}</span>
                 <span class="tag years" v-if="p.years !== 4">{{ p.years }}年</span>
-                <span class="tag interview" v-if="p.interview">&#x1F4AC; 面試</span>
+                <span class="tag incompatible" v-if="p.incompatible">⚠ 計分不同</span>
+                <span class="tag interview" v-if="p.interview && !p.incompatible">&#x1F4AC; 面試</span>
               </div>
             </div>
             <div class="prog-card-right">
-              <div class="chance-big" :style="{color: chanceColor(p.chance)}">{{ p.chance }}%</div>
+              <div class="chance-big" :style="{color: p.incompatible ? 'var(--text3)' : chanceColor(p.chance)}">{{ p.incompatible ? '—' : p.chance + '%' }}</div>
               <div class="chance-label-sm">機會</div>
             </div>
           </div>
@@ -153,11 +155,12 @@
               <div class="prog-tags">
                 <span class="tag">{{ p.category }}</span>
                 <span class="tag years" v-if="p.years !== 4">{{ p.years }}年</span>
-                <span class="tag interview" v-if="p.interview">&#x1F4AC; 面試</span>
+                <span class="tag incompatible" v-if="p.incompatible">⚠ 計分不同</span>
+                <span class="tag interview" v-if="p.interview && !p.incompatible">&#x1F4AC; 面試</span>
               </div>
             </div>
             <div class="prog-card-right">
-              <div class="chance-big" :style="{color: chanceColor(p.chance)}">{{ p.chance }}%</div>
+              <div class="chance-big" :style="{color: p.incompatible ? 'var(--text3)' : chanceColor(p.chance)}">{{ p.incompatible ? '—' : p.chance + '%' }}</div>
               <div class="chance-label-sm">機會</div>
             </div>
           </div>
@@ -244,7 +247,8 @@
               <div class="prog-tags">
                 <span class="tag">{{ p.category }}</span>
                 <span class="tag years" v-if="p.years !== 4">{{ p.years }}年</span>
-                <span class="tag interview" v-if="p.interview">&#x1F4AC; 面試</span>
+                <span class="tag incompatible" v-if="p.incompatible">⚠ 計分不同</span>
+                <span class="tag interview" v-if="p.interview && !p.incompatible">&#x1F4AC; 面試</span>
               </div>
             </div>
           </div>
@@ -327,13 +331,14 @@ function calcChance(score, median, lq, uq) {
 }
 
 const matchResults = computed(() => {
-  if (best5Score.value === 0) return { safe: [], match: [], reach: [] }
+  if (best5Score.value === 0) return { safe: [], match: [], reach: [], incompatible: [] }
   const score = best5Score.value
-  const safe = [], match = [], reach = []
+  const safe = [], match = [], reach = [], incompatible = []
   for (const p of programs) {
     if (p.median == null) continue
+    if (p.median > 100) { incompatible.push({ ...p, chance: null, incompatible: true }); continue }
     const chance = calcChance(score, p.median, p.lq, p.uq)
-    const progWithChance = { ...p, chance }
+    const progWithChance = { ...p, chance, incompatible: false }
     const diff = score - p.median
     if (diff >= 3) safe.push(progWithChance)
     else if (diff >= -5) match.push(progWithChance)
@@ -374,7 +379,7 @@ const currentPage = ref(1)
 watch([selectedUni, selectedCategory, searchQuery, sortBy], () => { currentPage.value = 1 })
 
 const filteredPrograms = computed(() => {
-  let list = programs
+  let list = programs.map(p => ({ ...p, incompatible: p.median != null && p.median > 100 }))
   if (selectedUni.value !== 'all') list = list.filter(p => p.uni === selectedUni.value)
   if (selectedCategory.value) list = list.filter(p => p.category === selectedCategory.value)
   if (searchQuery.value.trim()) {
