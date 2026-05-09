@@ -1,0 +1,17 @@
+{
+  "name": "jupas-stats",
+  "version": "1.0.0",
+  "description": "JUPAS 2025 收生分數統計 Dashboard",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@vitejs/plugin-vue": "^6.0.6",
+    "vue": "^3.4.0"
+  },
+  "devDependencies": {
+    "vite": "^5.0.0"
+  }
+}
