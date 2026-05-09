@@ -284,3 +284,272 @@ footer { text-align: center; font-size: 12px; color: var(--text3); padding: 24px
   .uni-badge { font-size: 10px; }
   .prog-name-cell { max-width: 140px; }
 }
+
+
+/* ── Grade Select with Arrow ── */
+.grade-select-wrap {
+  position: relative;
+  flex: 1;
+}
+.grade-select-wrap .grade-select {
+  width: 100%;
+  padding-right: 28px;
+  text-align: left;
+  font-size: 14px;
+}
+.grade-arrow {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 10px;
+  color: var(--text3);
+  pointer-events: none;
+}
+.grade-pts {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--primary);
+  width: 36px;
+  text-align: right;
+  flex-shrink: 0;
+}
+.grade-pts.dim { color: var(--text3); }
+
+/* ── Program Card ── */
+.prog-card {
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 14px;
+  margin-bottom: 8px;
+  box-shadow: var(--shadow);
+  border-left: 3px solid transparent;
+}
+.prog-card.safe { border-left-color: var(--success); }
+.prog-card.match { border-left-color: var(--warning); }
+.prog-card.reach { border-left-color: var(--danger); }
+.prog-card.browse { border-left-color: var(--border); }
+
+.prog-card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+.prog-card-left { flex: 1; min-width: 0; }
+.prog-card-right {
+  text-align: right;
+  flex-shrink: 0;
+}
+.chance-big {
+  font-family: var(--font-title);
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 1;
+}
+.chance-label-sm {
+  font-size: 10px;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.prog-card-scores {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 4px;
+  background: var(--surface2);
+  border-radius: 8px;
+  padding: 8px;
+  margin-top: 4px;
+}
+.sc-item {
+  text-align: center;
+}
+.sc-item.highlight {
+  background: #E8F0FF;
+  border-radius: 6px;
+  padding: 2px;
+}
+.sc-item.your { }
+.sc-lbl {
+  display: block;
+  font-size: 9px;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  margin-bottom: 2px;
+}
+.sc-val {
+  display: block;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+}
+.sc-val.high { color: var(--success); }
+.sc-val.mid { color: var(--warning); }
+.sc-val.low { color: var(--danger); }
+.sc-val.warn { color: var(--warning); }
+.sc-val.ok { color: var(--success); }
+.sc-val.dim { color: var(--text3); font-size: 11px; font-weight: 500; }
+
+/* ── Match Group Title ── */
+.match-group-title {
+  font-size: 13px;
+  font-weight: 600;
+  margin: 16px 0 8px;
+  padding: 0 2px;
+}
+.match-group-title.safe { color: var(--success); }
+.match-group-title.match { color: var(--warning); }
+.match-group-title.reach { color: var(--danger); }
+
+/* ── Program List ── */
+.prog-list { }
+
+/* ── Styled Select ── */
+.select-wrap {
+  position: relative;
+}
+.select-wrap select {
+  padding-right: 24px !important;
+  font-size: 13px;
+}
+.sel-arrow {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 10px;
+  color: var(--text3);
+  pointer-events: none;
+}
+
+/* ── Result Count ── */
+.result-count {
+  font-size: 12px;
+  color: var(--text3);
+  padding: 0 4px 8px;
+}
+
+/* ── Sections ── */
+.calc-section { }
+.browser-section { }
+
+/* ── Chance Bar (full width) ── */
+.chance-bar-wrap { margin-top: 6px; }
+.chance-bar-bg { height: 5px; background: var(--surface2); border-radius: 3px; overflow: hidden; }
+.chance-bar { height: 100%; border-radius: 3px; }
+
+/* ── Mobile card adjustments ── */
+@media (max-width: 480px) {
+  .prog-card { padding: 12px; }
+  .prog-card-scores { grid-template-columns: repeat(3, 1fr); }
+  .sc-val { font-size: 14px; }
+  .chance-big { font-size: 22px; }
+}
+
+
+/* ── Grade Select with Arrow ── */
+.grade-select-wrap {
+  position: relative;
+  flex: 1;
+}
+.grade-select-wrap .grade-select {
+  width: 100%;
+  padding-right: 28px;
+  text-align: left;
+  font-size: 14px;
+}
+.grade-arrow {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 10px;
+  color: var(--text3);
+  pointer-events: none;
+}
+.grade-pts {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--primary);
+  width: 36px;
+  text-align: right;
+  flex-shrink: 0;
+}
+.grade-pts.dim { color: var(--text3); }
+
+/* ── Program Card ── */
+.prog-card {
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 14px;
+  margin-bottom: 8px;
+  box-shadow: var(--shadow);
+  border-left: 3px solid transparent;
+}
+.prog-card.safe { border-left-color: var(--success); }
+.prog-card.match { border-left-color: var(--warning); }
+.prog-card.reach { border-left-color: var(--danger); }
+.prog-card.browse { border-left-color: var(--border); }
+
+.prog-card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+.prog-card-left { flex: 1; min-width: 0; }
+.prog-card-right { text-align: right; flex-shrink: 0; }
+.chance-big {
+  font-family: var(--font-title);
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 1;
+}
+.chance-label-sm { font-size: 10px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.5px; }
+
+.prog-card-scores {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 4px;
+  background: var(--surface2);
+  border-radius: 8px;
+  padding: 8px;
+  margin-top: 4px;
+}
+.sc-item { text-align: center; }
+.sc-item.highlight { background: #E8F0FF; border-radius: 6px; padding: 2px; }
+.sc-lbl { display: block; font-size: 9px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.3px; margin-bottom: 2px; }
+.sc-val { display: block; font-size: 15px; font-weight: 700; color: var(--text); }
+.sc-val.high { color: var(--success); }
+.sc-val.mid { color: var(--warning); }
+.sc-val.low { color: var(--danger); }
+.sc-val.warn { color: var(--warning); }
+.sc-val.ok { color: var(--success); }
+.sc-val.dim { color: var(--text3); font-size: 11px; font-weight: 500; }
+
+.match-group-title { font-size: 13px; font-weight: 600; margin: 16px 0 8px; padding: 0 2px; }
+.match-group-title.safe { color: var(--success); }
+.match-group-title.match { color: var(--warning); }
+.match-group-title.reach { color: var(--danger); }
+
+.select-wrap { position: relative; }
+.select-wrap select { padding-right: 24px !important; font-size: 13px; }
+.sel-arrow { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); font-size: 10px; color: var(--text3); pointer-events: none; }
+
+.result-count { font-size: 12px; color: var(--text3); padding: 0 4px 8px; }
+
+.chance-bar-wrap { margin-top: 6px; }
+.chance-bar-bg { height: 5px; background: var(--surface2); border-radius: 3px; overflow: hidden; }
+.chance-bar { height: 100%; border-radius: 3px; }
+
+@media (max-width: 480px) {
+  .prog-card { padding: 12px; }
+  .prog-card-scores { grid-template-columns: repeat(3, 1fr); }
+  .sc-val { font-size: 14px; }
+  .chance-big { font-size: 22px; }
+}

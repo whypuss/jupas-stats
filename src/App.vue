@@ -7,246 +7,278 @@
       <div class="header-sub">輸入 HKDSE 成績，計算升學機會</div>
     </header>
 
-    <!-- Calculator -->
-    <section>
-      <div class="section-title">HKDSE 成績</div>
+    <!-- ── Calculator ── -->
+    <section class="calc-section">
+      <div class="section-title">&#x1F4DA; HKDSE 成績輸入</div>
+
       <div class="grade-grid">
         <div class="grade-item" v-for="(subj, idx) in subjects" :key="idx">
           <label>{{ subj.label }}</label>
-          <select v-model="grades[idx]" class="grade-select" :class="gradeClass(grades[idx])">
-            <option value="">—</option>
-            <option v-for="g in gradeOptions" :key="g" :value="g">{{ g }}</option>
-          </select>
+          <div class="grade-select-wrap">
+            <select v-model="grades[idx]" class="grade-select" :class="gradeClass(grades[idx])">
+              <option value="">—</option>
+              <option v-for="g in gradeOptions" :key="g" :value="g">{{ g }}</option>
+            </select>
+            <span class="grade-arrow">&#x276F;</span>
+          </div>
+          <div class="grade-pts" v-if="gradePoints[grades[idx]]">
+            {{ gradePoints[grades[idx]] }}分
+          </div>
+          <div class="grade-pts dim" v-else>—</div>
         </div>
       </div>
 
+      <!-- Score -->
       <div class="score-card" v-if="best5Score > 0">
         <div class="score-big">{{ best5Score.toFixed(1) }}</div>
         <div class="score-label">最佳5科總分</div>
       </div>
 
+      <!-- Match Chips -->
       <div class="match-chips" v-if="best5Score > 0">
         <div class="match-chip safe">
           <div class="chip-count">{{ matchResults.safe.length }}</div>
-          <div class="chip-label">穩陣</div>
+          <div class="chip-label">&#x2705; 穩陣</div>
         </div>
         <div class="match-chip match">
           <div class="chip-count">{{ matchResults.match.length }}</div>
-          <div class="chip-label">合理</div>
+          <div class="chip-label">&#x1F3AF; 合理</div>
         </div>
         <div class="match-chip reach">
           <div class="chip-count">{{ matchResults.reach.length }}</div>
-          <div class="chip-label">衝刺</div>
+          <div class="chip-label">&#x1F525; 衝刺</div>
         </div>
       </div>
 
-      <div v-if="best5Score > 0">
-        <div v-if="matchResults.safe.length" class="match-group">
-          <div class="match-title safe">穩陣 — 高於中位分</div>
-          <div v-for="p in matchResults.safe.slice(0,6)" :key="p.code+p.uni" class="program-card safe">
-            <div class="card-header">
-              <span class="uni-dot" :style="{background: getUni(p.uni).color}"></span>
-              <span class="uni-name">{{ getUni(p.uni).name }}</span>
-              <span class="prog-code">{{ p.code }}</span>
-            </div>
-            <div class="prog-name">{{ p.name }}</div>
-            <div class="prog-tags">
-              <span class="tag">{{ p.category }}</span>
-              <span class="tag years" v-if="p.years !== 4">{{ p.years }}年</span>
-              <span class="tag interview" v-if="p.interview">面試</span>
-            </div>
-            <div class="score-pills">
-              <div class="score-pill">
-                <span class="sp-label">上四分</span>
-                <span class="sp-val" :class="scoreClass(p.uq)">{{ p.uq ?? '—' }}</span>
-              </div>
-              <div class="score-pill highlight">
-                <span class="sp-label">中位分</span>
-                <span class="sp-val" :class="scoreClass(p.median)">{{ p.median ?? '—' }}</span>
-              </div>
-              <div class="score-pill">
-                <span class="sp-label">下四分</span>
-                <span class="sp-val" :class="scoreClass(p.lq)">{{ p.lq ?? '—' }}</span>
+      <!-- Safe Cards -->
+      <div v-if="best5Score > 0 && matchResults.safe.length">
+        <div class="match-group-title safe">&#x2705; 穩陣 — 高於中位分</div>
+        <div v-for="p in matchResults.safe.slice(0,12)" :key="p.code+p.uni" class="prog-card safe">
+          <div class="prog-card-top">
+            <div class="prog-card-left">
+              <span class="uni-badge" :style="{background: getUni(p.uni).color+'18', color: getUni(p.uni).color}">
+                {{ getUni(p.uni).name }}
+              </span>
+              <div class="prog-name">{{ p.name }}</div>
+              <div class="prog-tags">
+                <span class="tag">{{ p.category }}</span>
+                <span class="tag years" v-if="p.years !== 4">{{ p.years }}年</span>
+                <span class="tag interview" v-if="p.interview">&#x1F4AC; 面試</span>
               </div>
             </div>
-            <div class="chance-row">
-              <span class="chance-label-sm">機會</span>
-              <div class="chance-bar-bg">
-                <div class="chance-bar" :style="{width: p.chance+'%', background: chanceColor(p.chance)}"></div>
-              </div>
-              <span class="chance-pct" :style="{color: chanceColor(p.chance)}">{{ p.chance }}%</span>
+            <div class="prog-card-right">
+              <div class="chance-big" :style="{color: chanceColor(p.chance)}">{{ p.chance }}%</div>
+              <div class="chance-label-sm">機會</div>
+            </div>
+          </div>
+          <div class="prog-card-scores">
+            <div class="sc-item">
+              <span class="sc-lbl">&#x25B2; 上四分</span>
+              <span class="sc-val" :class="scoreClass(p.uq)">{{ p.uq ?? '—' }}</span>
+            </div>
+            <div class="sc-item highlight">
+              <span class="sc-lbl">&#x25CF; 中位</span>
+              <span class="sc-val" :class="scoreClass(p.median)">{{ p.median ?? '—' }}</span>
+            </div>
+            <div class="sc-item">
+              <span class="sc-lbl">&#x25BC; 下四分</span>
+              <span class="sc-val" :class="scoreClass(p.lq)">{{ p.lq ?? '—' }}</span>
+            </div>
+            <div class="sc-item your">
+              <span class="sc-lbl">你的</span>
+              <span class="sc-val" :class="scoreClass(best5Score)">{{ best5Score.toFixed(1) }}</span>
+            </div>
+          </div>
+          <div class="chance-bar-wrap">
+            <div class="chance-bar-bg">
+              <div class="chance-bar" :style="{width: p.chance+'%', background: chanceColor(p.chance)}"></div>
             </div>
           </div>
         </div>
+      </div>
 
-        <div v-if="matchResults.match.length" class="match-group">
-          <div class="match-title match">合理 — 接近中位分</div>
-          <div v-for="p in matchResults.match.slice(0,6)" :key="p.code+p.uni" class="program-card match">
-            <div class="card-header">
-              <span class="uni-dot" :style="{background: getUni(p.uni).color}"></span>
-              <span class="uni-name">{{ getUni(p.uni).name }}</span>
-              <span class="prog-code">{{ p.code }}</span>
-            </div>
-            <div class="prog-name">{{ p.name }}</div>
-            <div class="prog-tags">
-              <span class="tag">{{ p.category }}</span>
-              <span class="tag years" v-if="p.years !== 4">{{ p.years }}年</span>
-              <span class="tag interview" v-if="p.interview">面試</span>
-            </div>
-            <div class="score-pills">
-              <div class="score-pill">
-                <span class="sp-label">中位分</span>
-                <span class="sp-val" :class="scoreClass(p.median)">{{ p.median ?? '—' }}</span>
-              </div>
-              <div class="score-pill">
-                <span class="sp-label">下四分</span>
-                <span class="sp-val" :class="scoreClass(p.lq)">{{ p.lq ?? '—' }}</span>
+      <!-- Match Cards -->
+      <div v-if="best5Score > 0 && matchResults.match.length">
+        <div class="match-group-title match">&#x1F3AF; 合理 — 接近中位分</div>
+        <div v-for="p in matchResults.match.slice(0,12)" :key="p.code+p.uni" class="prog-card match">
+          <div class="prog-card-top">
+            <div class="prog-card-left">
+              <span class="uni-badge" :style="{background: getUni(p.uni).color+'18', color: getUni(p.uni).color}">
+                {{ getUni(p.uni).name }}
+              </span>
+              <div class="prog-name">{{ p.name }}</div>
+              <div class="prog-tags">
+                <span class="tag">{{ p.category }}</span>
+                <span class="tag years" v-if="p.years !== 4">{{ p.years }}年</span>
+                <span class="tag interview" v-if="p.interview">&#x1F4AC; 面試</span>
               </div>
             </div>
-            <div class="chance-row">
-              <span class="chance-label-sm">機會</span>
-              <div class="chance-bar-bg">
-                <div class="chance-bar" :style="{width: p.chance+'%', background: chanceColor(p.chance)}"></div>
-              </div>
-              <span class="chance-pct" :style="{color: chanceColor(p.chance)}">{{ p.chance }}%</span>
+            <div class="prog-card-right">
+              <div class="chance-big" :style="{color: chanceColor(p.chance)}">{{ p.chance }}%</div>
+              <div class="chance-label-sm">機會</div>
+            </div>
+          </div>
+          <div class="prog-card-scores">
+            <div class="sc-item highlight">
+              <span class="sc-lbl">&#x25CF; 中位</span>
+              <span class="sc-val" :class="scoreClass(p.median)">{{ p.median ?? '—' }}</span>
+            </div>
+            <div class="sc-item">
+              <span class="sc-lbl">&#x25BC; 下四分</span>
+              <span class="sc-val" :class="scoreClass(p.lq)">{{ p.lq ?? '—' }}</span>
+            </div>
+            <div class="sc-item your">
+              <span class="sc-lbl">你的</span>
+              <span class="sc-val" :class="scoreClass(best5Score)">{{ best5Score.toFixed(1) }}</span>
+            </div>
+          </div>
+          <div class="chance-bar-wrap">
+            <div class="chance-bar-bg">
+              <div class="chance-bar" :style="{width: p.chance+'%', background: chanceColor(p.chance)}"></div>
             </div>
           </div>
         </div>
+      </div>
 
-        <div v-if="matchResults.reach.length" class="match-group">
-          <div class="match-title reach">衝刺 — 低於下四分位</div>
-          <div v-for="p in matchResults.reach.slice(0,6)" :key="p.code+p.uni" class="program-card reach">
-            <div class="card-header">
-              <span class="uni-dot" :style="{background: getUni(p.uni).color}"></span>
-              <span class="uni-name">{{ getUni(p.uni).name }}</span>
-              <span class="prog-code">{{ p.code }}</span>
-            </div>
-            <div class="prog-name">{{ p.name }}</div>
-            <div class="prog-tags">
-              <span class="tag">{{ p.category }}</span>
-              <span class="tag years" v-if="p.years !== 4">{{ p.years }}年</span>
-              <span class="tag interview" v-if="p.interview">面試</span>
-            </div>
-            <div class="score-pills">
-              <div class="score-pill">
-                <span class="sp-label">中位分</span>
-                <span class="sp-val" :class="scoreClass(p.median)">{{ p.median ?? '—' }}</span>
-              </div>
-              <div class="score-pill">
-                <span class="sp-label">下四分</span>
-                <span class="sp-val" :class="scoreClass(p.lq)">{{ p.lq ?? '—' }}</span>
+      <!-- Reach Cards -->
+      <div v-if="best5Score > 0 && matchResults.reach.length">
+        <div class="match-group-title reach">&#x1F525; 衝刺 — 低於下四分</div>
+        <div v-for="p in matchResults.reach.slice(0,12)" :key="p.code+p.uni" class="prog-card reach">
+          <div class="prog-card-top">
+            <div class="prog-card-left">
+              <span class="uni-badge" :style="{background: getUni(p.uni).color+'18', color: getUni(p.uni).color}">
+                {{ getUni(p.uni).name }}
+              </span>
+              <div class="prog-name">{{ p.name }}</div>
+              <div class="prog-tags">
+                <span class="tag">{{ p.category }}</span>
+                <span class="tag years" v-if="p.years !== 4">{{ p.years }}年</span>
+                <span class="tag interview" v-if="p.interview">&#x1F4AC; 面試</span>
               </div>
             </div>
-            <div class="chance-row">
-              <span class="chance-label-sm">機會</span>
-              <div class="chance-bar-bg">
-                <div class="chance-bar" :style="{width: p.chance+'%', background: chanceColor(p.chance)}"></div>
-              </div>
-              <span class="chance-pct" :style="{color: chanceColor(p.chance)}">{{ p.chance }}%</span>
+            <div class="prog-card-right">
+              <div class="chance-big" :style="{color: chanceColor(p.chance)}">{{ p.chance }}%</div>
+              <div class="chance-label-sm">機會</div>
+            </div>
+          </div>
+          <div class="prog-card-scores">
+            <div class="sc-item highlight">
+              <span class="sc-lbl">&#x25CF; 中位</span>
+              <span class="sc-val" :class="scoreClass(p.median)">{{ p.median ?? '—' }}</span>
+            </div>
+            <div class="sc-item">
+              <span class="sc-lbl">&#x25BC; 下四分</span>
+              <span class="sc-val" :class="scoreClass(p.lq)">{{ p.lq ?? '—' }}</span>
+            </div>
+            <div class="sc-item your">
+              <span class="sc-lbl">你的</span>
+              <span class="sc-val" :class="scoreClass(best5Score)">{{ best5Score.toFixed(1) }}</span>
+            </div>
+          </div>
+          <div class="chance-bar-wrap">
+            <div class="chance-bar-bg">
+              <div class="chance-bar" :style="{width: p.chance+'%', background: chanceColor(p.chance)}"></div>
             </div>
           </div>
         </div>
       </div>
     </section>
 
-    <div class="section-divider"><span>全部課程</span></div>
+    <div class="section-divider"><span>&#x1F4CB; 全部課程</span></div>
 
-    <!-- Browser -->
-    <section>
+    <!-- ── Program Browser ── -->
+    <section class="browser-section">
       <div class="filters">
         <div class="filter-row">
           <div class="filter-group">
             <label>院校</label>
-            <select v-model="selectedUni" @change="currentPage=1">
-              <option value="all">全部</option>
-              <option v-for="u in universities" :key="u.id" :value="u.id">{{ u.name }}</option>
-            </select>
+            <div class="select-wrap">
+              <select v-model="selectedUni" @change="currentPage=1">
+                <option value="all">全部</option>
+                <option v-for="u in universities" :key="u.id" :value="u.id">{{ u.name }}</option>
+              </select>
+              <span class="sel-arrow">&#x276F;</span>
+            </div>
           </div>
           <div class="filter-group">
             <label>類別</label>
-            <select v-model="selectedCategory" @change="currentPage=1">
-              <option value="">全部</option>
-              <option v-for="c in categories" :key="c" :value="c">{{ c }}</option>
-            </select>
+            <div class="select-wrap">
+              <select v-model="selectedCategory" @change="currentPage=1">
+                <option value="">全部</option>
+                <option v-for="c in categories" :key="c" :value="c">{{ c }}</option>
+              </select>
+              <span class="sel-arrow">&#x276F;</span>
+            </div>
           </div>
         </div>
         <div class="filter-row">
           <div class="filter-group" style="flex:2">
-            <label>搜尋</label>
-            <input v-model="searchQuery" type="text" placeholder="課程名稱 / 編號..." @input="currentPage=1" />
+            <label>&#x1F50D; 搜尋</label>
+            <input v-model="searchQuery" type="text" placeholder="課程名稱..." @input="currentPage=1" />
           </div>
           <div class="filter-group">
             <label>排序</label>
-            <select v-model="sortBy" @change="currentPage=1">
-              <option value="median-desc">分數 高→低</option>
-              <option value="median-asc">分數 低→高</option>
-              <option value="name">課程名稱</option>
-            </select>
+            <div class="select-wrap">
+              <select v-model="sortBy" @change="currentPage=1">
+                <option value="median-desc">分數 高→低</option>
+                <option value="median-asc">分數 低→高</option>
+                <option value="name">名稱</option>
+              </select>
+              <span class="sel-arrow">&#x276F;</span>
+            </div>
           </div>
         </div>
       </div>
 
-      <div style="font-size:12px;color:var(--text3);padding:0 4px 8px;">
-        {{ filteredPrograms.length }} 個課程
+      <div class="result-count">{{ filteredPrograms.length }} 個課程</div>
+
+      <!-- Program Card List -->
+      <div class="prog-list">
+        <div v-for="p in paginatedPrograms" :key="p.code+p.uni" class="prog-card browse">
+          <div class="prog-card-top">
+            <div class="prog-card-left">
+              <span class="uni-badge" :style="{background: getUni(p.uni).color+'18', color: getUni(p.uni).color}">
+                {{ getUni(p.uni).name }}
+              </span>
+              <div class="prog-name">{{ p.name }}</div>
+              <div class="prog-tags">
+                <span class="tag">{{ p.category }}</span>
+                <span class="tag years" v-if="p.years !== 4">{{ p.years }}年</span>
+                <span class="tag interview" v-if="p.interview">&#x1F4AC; 面試</span>
+              </div>
+            </div>
+          </div>
+          <div class="prog-card-scores">
+            <div class="sc-item" v-if="p.uq">
+              <span class="sc-lbl">&#x25B2; 上四分</span>
+              <span class="sc-val warn">{{ p.uq }}</span>
+            </div>
+            <div class="sc-item highlight">
+              <span class="sc-lbl">&#x25CF; 中位</span>
+              <span class="sc-val" :class="scoreClass(p.median)">{{ p.median ?? '—' }}</span>
+            </div>
+            <div class="sc-item" v-if="p.lq">
+              <span class="sc-lbl">&#x25BC; 下四分</span>
+              <span class="sc-val ok">{{ p.lq }}</span>
+            </div>
+            <div class="sc-item">
+              <span class="sc-lbl">計分</span>
+              <span class="sc-val dim">{{ p.formula }}</span>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>院校</th>
-              <th>課程</th>
-              <th>計分</th>
-              <th style="text-align:center">上</th>
-              <th style="text-align:center">中</th>
-              <th style="text-align:center">下</th>
-              <th style="text-align:center">年</th>
-              <th style="text-align:center">面</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="p in paginatedPrograms" :key="p.code+p.uni" class="table-row">
-              <td>
-                <span class="uni-badge" :style="{background: getUni(p.uni).color+'18', color: getUni(p.uni).color}">
-                  {{ getUni(p.uni).name }}
-                </span>
-              </td>
-              <td>
-                <div class="prog-name-cell">
-                  <span class="prog-code-sm">{{ p.code }}</span>
-                  <span style="font-size:13px;font-weight:500">{{ p.name }}</span>
-                  <span style="font-size:11px;color:var(--text3)">{{ p.category }}</span>
-                </div>
-              </td>
-              <td class="formula-cell">{{ p.formula }}</td>
-              <td class="num-cell" :class="p.uq ? 'has-uq' : ''" style="text-align:center">{{ p.uq ?? '—' }}</td>
-              <td class="num-cell" style="text-align:center">
-                <strong :style="{color: scoreColor(p.median)}">{{ p.median ?? '—' }}</strong>
-              </td>
-              <td class="num-cell" :class="p.lq ? 'has-lq' : ''" style="text-align:center">{{ p.lq ?? '—' }}</td>
-              <td style="text-align:center">
-                <span class="tag years" v-if="p.years !== 4" style="font-size:10px;padding:1px 5px">{{ p.years }}</span>
-                <span v-else style="color:var(--text3);font-size:12px">4</span>
-              </td>
-              <td style="text-align:center">
-                <span style="color:var(--danger);font-size:12px" v-if="p.interview">要</span>
-                <span v-else style="color:var(--text3);font-size:12px">—</span>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <div class="pagination">
-        <button class="page-btn" :disabled="currentPage===1" @click="currentPage--">‹</button>
+      <div class="pagination" v-if="totalPages > 1">
+        <button class="page-btn" :disabled="currentPage===1" @click="currentPage--">&#x276E;</button>
         <button v-for="n in pageRange" :key="n" class="page-btn" :class="{active: n===currentPage}" @click="currentPage=n">{{ n }}</button>
-        <button class="page-btn" :disabled="currentPage>=totalPages" @click="currentPage++">›</button>
+        <button class="page-btn" :disabled="currentPage>=totalPages" @click="currentPage++">&#x276F;</button>
       </div>
     </section>
 
     <footer>
       JUPAS 2025 · 資料僅供參考<br/>
-      <small style="color:var(--text3)">升學機會為估算，實際取錄視乎面試、Band選擇等因素</small>
+      <small>升學機會為估算，實際取錄視乎面試、Band選擇等因素</small>
     </footer>
   </div>
 </template>
@@ -255,7 +287,7 @@
 import { ref, computed, watch } from 'vue'
 import { universities, programs, gradePoints, gradeOptions } from './data.js'
 
-const PAGE_SIZE = 25
+const PAGE_SIZE = 20
 
 const categories = [...new Set(programs.map(p => p.category))].sort()
 
