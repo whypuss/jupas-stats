@@ -223,6 +223,7 @@
             <label>排序</label>
             <div class="select-wrap">
               <select v-model="sortBy" @change="currentPage=1">
+                <option value="chance-desc">成功機率</option>
                 <option value="median-desc">分數 高→低</option>
                 <option value="median-asc">分數 低→高</option>
                 <option value="name">名稱</option>
@@ -379,7 +380,12 @@ const currentPage = ref(1)
 watch([selectedUni, selectedCategory, searchQuery, sortBy], () => { currentPage.value = 1 })
 
 const filteredPrograms = computed(() => {
-  let list = programs.map(p => ({ ...p, incompatible: p.median != null && p.median > 100 }))
+  let list = programs.map(p => {
+    const score = best5Score.value
+    const incompatible = p.median != null && p.median > 100
+    const chance = score > 0 && !incompatible ? calcChance(score, p.median, p.lq, p.uq) : 0
+    return { ...p, incompatible, chance }
+  })
   if (selectedUni.value !== 'all') list = list.filter(p => p.uni === selectedUni.value)
   if (selectedCategory.value) list = list.filter(p => p.category === selectedCategory.value)
   if (searchQuery.value.trim()) {
@@ -387,7 +393,8 @@ const filteredPrograms = computed(() => {
     list = list.filter(p => p.name.toLowerCase().includes(q) || p.code.toLowerCase().includes(q) || p.formula.toLowerCase().includes(q))
   }
   list = [...list]
-  if (sortBy.value === 'median-desc') list.sort((a, b) => (b.median ?? 0) - (a.median ?? 0))
+  if (sortBy.value === 'chance-desc') list.sort((a, b) => (b.chance ?? 0) - (a.chance ?? 0))
+  else if (sortBy.value === 'median-desc') list.sort((a, b) => (b.median ?? 0) - (a.median ?? 0))
   else if (sortBy.value === 'median-asc') list.sort((a, b) => (a.median ?? 0) - (b.median ?? 0))
   else if (sortBy.value === 'name') list.sort((a, b) => a.name.localeCompare(b.name))
   return list
