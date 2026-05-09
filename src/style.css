@@ -194,7 +194,7 @@ header {
   border: 1px solid var(--border);
 }
 .tag.interview { background: #FFF0F0; color: var(--danger); border-color: #FFD0D0; }
-.tag.incompatible { background: #F0F0F0; color: var(--text3); border-color: var(--border); font-size: 11px; }
+.tag.incompatible { background: #F0F0F0; color: #666; border-color: #CCC; font-size: 11px; }
 .tag.incompatible { background: #F0F0F0; color: #666; border-color: #CCC; font-size: 11px; }
 .tag.years { background: #FFF8E0; color: #8B6A00; border-color: #FFE080; }
 
