@@ -312,15 +312,18 @@ const best5Score = computed(() => {
 
 function calcChance(score, median, lq, uq) {
   if (median == null) return 0
-  if (uq != null && score >= uq + 3) return Math.min(95, 75 + (score - median) * 2)
+  const cap = (v) => Math.min(100, Math.round(v))
+  if (uq != null && score >= uq + 3) return cap(75 + (score - median) * 2)
   if (score >= median) {
-    const range = (uq ?? median + 5) - median
-    return Math.round(65 + ((score - median) / range) * 20)
+    const range = (uq ?? median * 1.15) - median
+    return cap(65 + ((score - median) / range) * 20)
   }
   if (score >= (lq ?? median - 5)) {
-    return Math.round(35 + ((score - (lq ?? median - 5)) / ((median - (lq ?? median - 5)) || 5)) * 30)
+    const lo = lq ?? median - 5
+    const hi = median
+    return cap(35 + ((score - lo) / (hi - lo || 5)) * 30)
   }
-  return Math.max(5, Math.round((score / (lq ?? 10)) * 15))
+  return Math.max(5, cap((score / (lq || median)) * 15))
 }
 
 const matchResults = computed(() => {
