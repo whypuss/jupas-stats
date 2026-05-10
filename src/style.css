@@ -491,6 +491,9 @@ footer { text-align: center; font-size: 12px; color: var(--text3); padding: 24px
 
 /* ── Sections ── */
 .calc-section { }
+.uni-selector-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.uni-selector { flex: 1; min-width: 200px; padding: 10px 12px; font-size: 15px; border: 1.5px solid var(--border); border-radius: 10px; background: var(--bg); color: var(--text); appearance: none; cursor: pointer; }
+.scoring-hint { font-size: 13px; color: var(--text3); white-space: nowrap; }
 .browser-section { }
 
 /* ── Chance Bar (full width) ── */
