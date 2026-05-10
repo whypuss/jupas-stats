@@ -10,5 +10,7 @@ export default defineConfig({
   },
   build: {
     outDir: 'dist',
+    minify: false,
+    sourcemap: true,
   },
 })
