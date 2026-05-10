@@ -15,13 +15,9 @@
         <select v-model="selectedUni" class="uni-selector">
           <option value="">— 選擇大學 —</option>
           <option value="hku">香港大學（5**=8.5分）</option>
-          <option value="cuhk">香港中文大學（5**=8.5分）</option>
-          <option value="hkust">香港科技大學（5**=8.5分）</option>
           <option value="polyu">香港理工大學（5**=8.5分）</option>
           <option value="cityu">香港城市大學（5**=7分）</option>
           <option value="hkbu">香港浸會大學（5**=7分）</option>
-          <option value="eduhk">香港教育大學（5**=7分）</option>
-          <option value="lingu">嶺南大學（5**=7分）</option>
           <option value="hkmud">香港都會大學（5**=7分）</option>
         </select>
         <div class="scoring-hint" v-if="selectedUni">
@@ -339,12 +335,12 @@ const bonusScore = ref(0)
 
 // 根據所選大學返回對應計分制
 const gradePointsForUni = computed(() => {
-  const highUni = ['hku', 'cuhk', 'hkust', 'polyu']
+  const highUni = ['hku', 'polyu']
   return highUni.includes(selectedUni.value) ? gradePointsHigh : gradePointsStandard
 })
 
 const currentScoringSystem = computed(() => {
-  const highUni = ['hku', 'cuhk', 'hkust', 'polyu']
+  const highUni = ['hku', 'polyu']
   return highUni.includes(selectedUni.value) ? '8.5分制' : '7分制'
 })
 
