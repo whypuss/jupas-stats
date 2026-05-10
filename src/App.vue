@@ -330,6 +330,12 @@ const best5Score = computed(() => {
   return pts.slice(0, 5).reduce((s, x) => s + x, 0) + (bonusScore.value || 0)
 })
 
+// Detect non-DSE scoring (pure numeric formula like "20.68", "16")
+function isNonDSE(formula) {
+  if (!formula) return false
+  return /^[\d.]+$/.test(formula.trim())
+}
+
 function calcChance(score, median, lq, uq) {
   if (median == null) return 0
   const cap = (v) => Math.min(100, Math.round(v))
@@ -397,7 +403,7 @@ watch([selectedUni, selectedCategory, searchQuery, sortBy], () => { currentPage.
 const filteredPrograms = computed(() => {
   let list = programs.map(p => {
     const score = best5Score.value
-    const incompatible = p.median != null && p.median > 100
+    const incompatible = (p.median != null && p.median > 100) || isNonDSE(p.formula)
     const chance = score > 0 && !incompatible ? calcChance(score, p.median, p.lq, p.uq) : 0
     return { ...p, incompatible, chance }
   })
@@ -412,6 +418,8 @@ const filteredPrograms = computed(() => {
   else if (sortBy.value === 'median-desc') list.sort((a, b) => (b.median ?? 0) - (a.median ?? 0))
   else if (sortBy.value === 'median-asc') list.sort((a, b) => (a.median ?? 0) - (b.median ?? 0))
   else if (sortBy.value === 'name') list.sort((a, b) => a.name.localeCompare(b.name))
+  // Move non-DSE to end
+  list.sort((a, b) => (a.incompatible === b.incompatible) ? 0 : a.incompatible ? 1 : -1)
   return list
 })
 
