@@ -9,7 +9,27 @@
 
     <!-- ── Calculator ── -->
     <section class="calc-section">
-      <div class="section-title">&#x1F4DA; HKDSE 成績輸入</div>
+      <div class="section-title">&#x1F4DA; 選擇大學計分制</div>
+
+      <div class="uni-selector-row">
+        <select v-model="selectedUni" class="uni-selector">
+          <option value="">— 選擇大學 —</option>
+          <option value="hku">香港大學（5**=8.5分）</option>
+          <option value="cuhk">香港中文大學（5**=8.5分）</option>
+          <option value="hkust">香港科技大學（5**=8.5分）</option>
+          <option value="polyu">香港理工大學（5**=8.5分）</option>
+          <option value="cityu">香港城市大學（5**=7分）</option>
+          <option value="hkbu">香港浸會大學（5**=7分）</option>
+          <option value="eduhk">香港教育大學（5**=7分）</option>
+          <option value="lingu">嶺南大學（5**=7分）</option>
+          <option value="hkmud">香港都會大學（5**=7分）</option>
+        </select>
+        <div class="scoring-hint" v-if="selectedUni">
+          計分制：{{ currentScoringSystem }}
+        </div>
+      </div>
+
+      <div class="section-title" style="margin-top:16px">&#x1F4DA; HKDSE 成績輸入</div>
 
       <div class="grade-grid">
         <div class="grade-item" v-for="(subj, idx) in subjects" :key="idx">
@@ -21,8 +41,8 @@
             </select>
             <span class="grade-arrow">&#x276F;</span>
           </div>
-          <div class="grade-pts" v-if="gradePoints[grades[idx]]">
-            {{ gradePoints[grades[idx]] }}分
+          <div class="grade-pts" v-if="gradePointsForUni[grades[idx]]">
+            {{ gradePointsForUni[grades[idx]] }}分
           </div>
           <div class="grade-pts dim" v-else>—</div>
         </div>
@@ -40,7 +60,7 @@
       <!-- Score -->
       <div class="score-card" v-if="best5Score > 0">
         <div class="score-big">{{ best5Score.toFixed(1) }}</div>
-        <div class="score-label">最佳5科 + M1/M2 總分</div>
+        <div class="score-label">最佳5科 + M1/M2（{{ currentScoringSystem }}）</div>
         <div class="score-breakdown" v-if="bonusScore > 0">
           <span class="score-part">Best5: {{ (best5Score - bonusScore).toFixed(1) }}</span>
           <span class="score-plus">+</span>
@@ -317,6 +337,17 @@ const subjects = [
 const grades = ref(['', '', '', '', '', ''])
 const bonusScore = ref(0)
 
+// 根據所選大學返回對應計分制
+const gradePointsForUni = computed(() => {
+  const highUni = ['hku', 'cuhk', 'hkust', 'polyu']
+  return highUni.includes(selectedUni.value) ? gradePointsHigh : gradePointsStandard
+})
+
+const currentScoringSystem = computed(() => {
+  const highUni = ['hku', 'cuhk', 'hkust', 'polyu']
+  return highUni.includes(selectedUni.value) ? '8.5分制' : '7分制'
+})
+
 function gradeClass(g) {
   if (g === '5**') return 'grade-5starstar'
   if (g === '5*') return 'grade-5star'
@@ -326,7 +357,8 @@ function gradeClass(g) {
 }
 
 const best5Score = computed(() => {
-  const pts = grades.value.map(g => gradePoints[g] || 0).sort((a, b) => b - a)
+  const gp = gradePointsForUni
+  const pts = grades.value.map(g => gp[g] || 0).sort((a, b) => b - a)
   return pts.slice(0, 5).reduce((s, x) => s + x, 0) + (bonusScore.value || 0)
 })
 
@@ -392,7 +424,7 @@ function scoreClass(score) {
   return 'high'
 }
 
-const selectedUni = ref('all')
+const selectedUni = ref('')
 const selectedCategory = ref('')
 const searchQuery = ref('')
 const sortBy = ref('median-desc')
@@ -407,7 +439,7 @@ const filteredPrograms = computed(() => {
     const chance = score > 0 && !incompatible ? calcChance(score, p.median, p.lq, p.uq) : 0
     return { ...p, incompatible, chance }
   })
-  if (selectedUni.value !== 'all') list = list.filter(p => p.uni === selectedUni.value)
+  if (selectedUni.value) list = list.filter(p => p.uni === selectedUni.value)
   if (selectedCategory.value) list = list.filter(p => p.category === selectedCategory.value)
   if (searchQuery.value.trim()) {
     const q = searchQuery.value.toLowerCase()
