@@ -328,9 +328,9 @@ const categories = [...new Set(programs.map(p => p.category))].sort()
 
 const subjects = [
   { label: '中文' }, { label: '英文' }, { label: '數學' },
-  { label: '選修1' }, { label: '選修2' }, { label: '選修3' },
+  { label: '選修1' }, { label: '選修2' }, { label: '選修3' }, { label: '選修4' },
 ]
-const grades = ref(['', '', '', '', '', ''])
+const grades = ref(['', '', '', '', '', '', ''])
 const bonusScore = ref(0)
 
 // 根據所選大學返回對應計分制
