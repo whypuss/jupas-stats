@@ -334,6 +334,11 @@ const grades = ref(['', '', '', '', '', ''])
 const bonusScore = ref(0)
 
 // 根據所選大學返回對應計分制
+// 8.5分制：港大/理工
+const gradePointsHigh = { '5**': 8.5, '5*': 7, '5': 6, '4': 5, '3': 4, '2': 3, '1': 2 }
+// 7分制：城大/浸大/都大
+const gradePointsStandard = { '5**': 7, '5*': 6, '5': 5, '4': 4, '3': 3, '2': 2, '1': 1 }
+
 const gradePointsForUni = computed(() => {
   const highUni = ['hku', 'polyu']
   return highUni.includes(selectedUni.value) ? gradePointsHigh : gradePointsStandard
@@ -353,7 +358,7 @@ function gradeClass(g) {
 }
 
 const best5Score = computed(() => {
-  const gp = gradePointsForUni
+  const gp = gradePointsForUni.value
   const pts = grades.value.map(g => gp[g] || 0).sort((a, b) => b - a)
   return pts.slice(0, 5).reduce((s, x) => s + x, 0) + (bonusScore.value || 0)
 })
